@@ -1,0 +1,39 @@
+{
+  "lab_cidr": "10.77.0.0/16",
+  "dns_suffix": "northstar.lab",
+  "zones": {
+    "management": "10.77.0.0/24",
+    "corporate": "10.77.10.0/24",
+    "development": "10.77.20.0/24",
+    "internal": "10.77.30.0/24",
+    "dmz": "10.77.40.0/24",
+    "security": "10.77.50.0/24",
+    "adversary": "10.77.60.0/24",
+    "simulation": "10.77.70.0/24"
+  },
+  "protected_target_zones": ["management", "security"],
+  "hosts": {
+    "edge-rtr-01": {"ip": "10.77.0.1", "zone": "management"},
+    "idp-01": {"ip": "10.77.30.10", "zone": "internal"},
+    "git-01": {"ip": "10.77.30.20", "zone": "internal"},
+    "db-01": {"ip": "10.77.30.30", "zone": "internal"},
+    "obj-01": {"ip": "10.77.30.40", "zone": "internal"},
+    "mail-01": {"ip": "10.77.30.50", "zone": "internal"},
+    "web-01": {"ip": "10.77.40.10", "zone": "dmz"},
+    "juice-01": {"ip": "10.77.40.20", "zone": "dmz"},
+    "dev-01": {"ip": "10.77.20.10", "zone": "development"},
+    "employee-01": {"ip": "10.77.10.10", "zone": "corporate"},
+    "red-01": {"ip": "10.77.60.10", "zone": "adversary"},
+    "sensor-01": {"ip": "10.77.50.10", "zone": "security"},
+    "search-01": {"ip": "10.77.50.20", "zone": "security"}
+  },
+  "tools": {
+    "curl": ["exercise"],
+    "http-replay": ["exercise"],
+    "auth-sprayer-lab": ["exercise"],
+    "benign-browser": ["observe", "simulate", "exercise"],
+    "event-replayer": ["simulate"],
+    "osquery-query": ["observe"],
+    "opensearch-query": ["observe"]
+  }
+}

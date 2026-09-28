@@ -1,0 +1,81 @@
+{
+  "scenario_id": "LAB-AUTH-001",
+  "version": "0.1.0",
+  "owner": "lab-team",
+  "risk_class": "exercise",
+  "status": "draft",
+  "attack_mapping": [
+    "T1110.003"
+  ],
+  "hypothesis": "Many failed sign-ins across several synthetic accounts from one source, followed by one success, indicate password spraying and are distinguishable from an employee mistyping their own password a few times.",
+  "scope": {
+    "source_identities": [
+      "synthetic-user-01",
+      "synthetic-user-02",
+      "synthetic-user-03",
+      "synthetic-user-04",
+      "synthetic-user-05"
+    ],
+    "source_hosts": [
+      "red-01"
+    ],
+    "target_hosts": [
+      "web-01.northstar.lab"
+    ],
+    "target_ports": [
+      443
+    ],
+    "allowed_tools": [
+      "auth-sprayer-lab",
+      "benign-browser"
+    ],
+    "time_window_minutes": 20,
+    "network_paths": [
+      "adversary -> dmz:443 -> internal idp-01 via reverse proxy"
+    ]
+  },
+  "benign_control": {
+    "description": "benign-browser signs in as synthetic-user-01 with two wrong passwords then the correct one.",
+    "differs_by": "number of distinct accounts targeted from one source (1 vs 5)"
+  },
+  "steps": [
+    {
+      "action": "auth-sprayer-lab tries one wrong password per synthetic account through https://web-01.northstar.lab/auth, then the known synthetic password for synthetic-user-05",
+      "expected": "Keycloak records 4 failures and 1 success from 10.77.60.10",
+      "stop_condition": "any account outside the synthetic-user list, any lockout of an operator account, or more than 50 attempts"
+    }
+  ],
+  "expected_evidence": [
+    {
+      "source": "keycloak event log",
+      "fields": [
+        "type",
+        "userId",
+        "ipAddress"
+      ],
+      "observation": "LOGIN_ERROR across 4 users then LOGIN",
+      "correlation_key": "run_id"
+    },
+    {
+      "source": "web-01 proxy access log",
+      "fields": [
+        "client_ip",
+        "path",
+        "status"
+      ],
+      "observation": "POSTs to /auth from 10.77.60.10",
+      "correlation_key": "run_id"
+    }
+  ],
+  "expected_triage": {
+    "detection": "spray rule (>=3 distinct users failing from one source in 10 minutes, then success) fires for the run and not for the control",
+    "jev_disposition": "likely_malicious",
+    "jev_queue": "identity",
+    "response_tier": "escalate_for_containment_approval"
+  },
+  "cleanup": [
+    "Reset synthetic-user-05 password and revoke its sessions in Keycloak",
+    "Clear brute-force lockout counters for synthetic users",
+    "Verify benign sign-in for synthetic-user-01 succeeds"
+  ]
+}

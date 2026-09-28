@@ -1,0 +1,21 @@
+{
+  "platform": "linux/arm64",
+  "tools": {
+    "ffuf": {
+      "module": "github.com/ffuf/ffuf/v2@v2.3.0",
+      "sha256": "4120625b2fc64035aebea1f8880e48716b96e04957316371dffb93c2ac1e9859"
+    },
+    "httpx": {
+      "module": "github.com/projectdiscovery/httpx/cmd/httpx@v1.12.0",
+      "sha256": "0c1fb1a311f1924b75cf8454104d18aaf3946431fb3bd0b04d05b61f24456ebd"
+    },
+    "katana": {
+      "module": "github.com/projectdiscovery/katana/cmd/katana@v1.7.0",
+      "sha256": "7e7851df69629c8b11f5cc428dc454bf1f6397150a068c0f74d5ba0a1e945351"
+    },
+    "nuclei": {
+      "module": "github.com/projectdiscovery/nuclei/v3/cmd/nuclei@v3.11.1",
+      "sha256": "ee7c0f91bdfdc29b271d9f7905ee44323a35880d538ed259dac7043b48c08d9b"
+    }
+  }
+}

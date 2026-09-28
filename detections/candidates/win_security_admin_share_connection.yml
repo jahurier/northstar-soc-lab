@@ -1,0 +1,23 @@
+title: Windows Administrative Share Connection
+id: 4d53ffab-86f8-4a68-a78a-ad1443d3c75e
+status: experimental
+description: Detects a connection to the administrative ADMIN$ share.
+author: Northstar Lab
+date: 2026-09-23
+logsource:
+    product: windows
+    service: security
+detection:
+    security:
+        Channel: Security
+    selection:
+        EventID: 5140
+        ShareName|contains: 'ADMIN$'
+    condition: security and selection
+falsepositives:
+    - Authorized remote administration and software deployment
+level: medium
+tags:
+    - attack.lateral-movement
+    - attack.t1021.002
+ruletype: Sigma

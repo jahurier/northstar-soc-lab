@@ -1,0 +1,86 @@
+{
+  "scenario_id": "LAB-WEB-001",
+  "version": "0.1.0",
+  "owner": "lab-team",
+  "risk_class": "exercise",
+  "status": "draft",
+  "attack_mapping": [
+    "T1190"
+  ],
+  "hypothesis": "A burst of injection-style requests against the training web app is distinguishable from normal browsing by payload patterns and error-rate change, and Zeek/Suricata plus proxy logs correlate to the same client.",
+  "scope": {
+    "source_identities": [
+      "anonymous-web-visitor"
+    ],
+    "source_hosts": [
+      "red-01"
+    ],
+    "target_hosts": [
+      "juice-01.northstar.lab"
+    ],
+    "target_ports": [
+      3000
+    ],
+    "allowed_tools": [
+      "curl",
+      "http-replay",
+      "benign-browser"
+    ],
+    "time_window_minutes": 30,
+    "network_paths": [
+      "adversary -> dmz:3000"
+    ]
+  },
+  "benign_control": {
+    "description": "benign-browser walks the Juice Shop catalog, search, and login pages from red-01 at normal pace.",
+    "differs_by": "request payload content (injection strings vs ordinary search terms); same source, target, and volume band"
+  },
+  "steps": [
+    {
+      "action": "http-replay sends the fixed request set fixtures/web-001-requests.txt to http://juice-01.northstar.lab:3000",
+      "expected": "Juice Shop returns errors for a subset of requests; proxy and app logs record each request",
+      "stop_condition": "any response from a host other than juice-01, or more than 500 requests"
+    }
+  ],
+  "expected_evidence": [
+    {
+      "source": "juice-shop app log",
+      "fields": [
+        "client_ip",
+        "path",
+        "status"
+      ],
+      "observation": "error spike from 10.77.60.10",
+      "correlation_key": "run_id"
+    },
+    {
+      "source": "zeek http.log",
+      "fields": [
+        "id.orig_h",
+        "uri",
+        "status_code"
+      ],
+      "observation": "matching URIs",
+      "correlation_key": "run_id"
+    },
+    {
+      "source": "suricata eve.json",
+      "fields": [
+        "alert.signature",
+        "src_ip"
+      ],
+      "observation": "web attack signature for 10.77.60.10",
+      "correlation_key": "run_id"
+    }
+  ],
+  "expected_triage": {
+    "detection": "a web-injection rule fires for the adversary run and not for the benign control",
+    "jev_disposition": "likely_malicious",
+    "jev_queue": "other",
+    "response_tier": "analyst_review"
+  },
+  "cleanup": [
+    "Restart juice-01 from its image to discard application state",
+    "Confirm juice-01 health check returns 200"
+  ]
+}

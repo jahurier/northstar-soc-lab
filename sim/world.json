@@ -1,0 +1,29 @@
+{
+  "company": "Northstar Works",
+  "domain": "northstar.lab",
+  "netbios": "NORTHSTAR",
+  "workday": {"start_hour": 8, "end_hour": 18},
+  "hosts": {
+    "WS-ENG-01": {"role": "workstation", "team": "engineering", "ip": "10.77.20.11"},
+    "WS-ENG-02": {"role": "workstation", "team": "engineering", "ip": "10.77.20.12"},
+    "WS-SALES-01": {"role": "workstation", "team": "sales", "ip": "10.77.10.11"},
+    "WS-SALES-02": {"role": "workstation", "team": "sales", "ip": "10.77.10.12"},
+    "WS-IT-01": {"role": "admin_workstation", "team": "it", "ip": "10.77.10.21"},
+    "SRV-DC-01": {"role": "domain_controller", "team": "it", "ip": "10.77.30.60"},
+    "SRV-FILE-01": {"role": "file_server", "team": "it", "ip": "10.77.30.70"},
+    "SRV-APP-01": {"role": "app_server", "team": "engineering", "ip": "10.77.30.80"}
+  },
+  "users": {
+    "adiaz": {"name": "Ana Diaz", "team": "engineering", "host": "WS-ENG-01", "persona": "developer"},
+    "bkim": {"name": "Ben Kim", "team": "engineering", "host": "WS-ENG-02", "persona": "developer"},
+    "cmoreau": {"name": "Claire Moreau", "team": "sales", "host": "WS-SALES-01", "persona": "office"},
+    "dokafor": {"name": "Dayo Okafor", "team": "sales", "host": "WS-SALES-02", "persona": "office"},
+    "eit": {"name": "Eli Tanaka", "team": "it", "host": "WS-IT-01", "persona": "it_admin"},
+    "svc_backup": {"name": "Backup service", "team": "it", "host": "SRV-FILE-01", "persona": "service"},
+    "svc_deploy": {"name": "Deploy service", "team": "engineering", "host": "SRV-APP-01", "persona": "service"}
+  },
+  "mix": {
+    "legit_events_per_user_hour": 18,
+    "lookalike_events_per_hour": 4
+  }
+}

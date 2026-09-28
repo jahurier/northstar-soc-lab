@@ -1,0 +1,79 @@
+{
+  "arms": {
+    "chain": {
+      "cases": 23,
+      "correct": 22,
+      "dispositions": {
+        "likely_benign": 20,
+        "likely_malicious": 2,
+        "needs_context": 1
+      },
+      "latency_ms": {
+        "p50": 289.0,
+        "p95": 801.7
+      },
+      "planted_attack": {
+        "cases": 3,
+        "correct": 2
+      },
+      "planted_benign": {
+        "cases": 20,
+        "correct": 20
+      },
+      "shadow_policy_recommendations": {
+        "analyst_review": 2,
+        "analyst_review_low_priority": 20,
+        "route_and_tag": 1
+      },
+      "tokens": {
+        "input": 44395,
+        "output": 5196
+      }
+    },
+    "single": {
+      "cases": 23,
+      "correct": 21,
+      "dispositions": {
+        "likely_benign": 20,
+        "likely_malicious": 1,
+        "needs_context": 2
+      },
+      "latency_ms": {
+        "p50": 304.3,
+        "p95": 733.4
+      },
+      "planted_attack": {
+        "cases": 3,
+        "correct": 1
+      },
+      "planted_benign": {
+        "cases": 20,
+        "correct": 20
+      },
+      "shadow_policy_recommendations": {
+        "analyst_review": 12,
+        "analyst_review_low_priority": 10,
+        "route_and_tag": 1
+      },
+      "tokens": {
+        "input": 37256,
+        "output": 5194
+      }
+    }
+  },
+  "cases": 23,
+  "cohort": "paired_world_single_vs_chain_v2",
+  "comparison": {
+    "cross_model_benchmark": false,
+    "type": "same_23_cases_different_context"
+  },
+  "definition": "Correct if Jev disposition is likely_malicious for planted attack or likely_benign for planted benign; needs_context and unsupported count as not correctly classified.",
+  "latency_definition": "Saved per-request API elapsed milliseconds; p95 uses nearest rank.",
+  "model": "jev-1.13.0",
+  "provenance": "planted_synthetic_truth",
+  "question_version": "security-triage-v2",
+  "sources": [
+    "world-single-v2-results.jsonl",
+    "world-chain-v2-results.jsonl"
+  ]
+}

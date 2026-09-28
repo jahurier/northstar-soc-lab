@@ -1,0 +1,22 @@
+name: Offline concept smoke test
+on: [push, pull_request]
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Check syntax and generate a synthetic day
+        env:
+          LAB_DATA: ${{ runner.temp }}/northstar-data
+          JEV_TEST: ${{ runner.temp }}/no-jev-test
+        run: |
+          bash -n quickstart.sh northstar.sh
+          python -m sim.generate --date 2026-09-22 --seed 20260922
+          python -m lab.validate scenarios/*.json
+          python smoke.py

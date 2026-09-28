@@ -1,0 +1,6 @@
+{
+  "nuclei_templates_commit": "0409ed000a987e4c3d5e16c8d7e7f7db36ac3360",
+  "wordlist_path": "Discovery/Web-Content/common.txt",
+  "wordlist_sha256": "47fb86ca6fb3f97e5491161581900d6d99851fb16764eacddf16aa85617c956a",
+  "wordlist_source_commit": "eccfbd405af82194e125a450a0076dbe4252d6f9"
+}

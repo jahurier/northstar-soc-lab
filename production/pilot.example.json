@@ -1,0 +1,29 @@
+{
+  "environment": "production_pilot",
+  "monitoring": {
+    "host": "monitor.example.internal",
+    "os": "linux",
+    "dedicated": true,
+    "elastic_url": "https://monitor.example.internal:9200",
+    "kibana_url": "https://monitor.example.internal:5601",
+    "fleet_url": "https://monitor.example.internal:8220",
+    "tls_verification": "required",
+    "off_host_backup_location": "s3://example-backup-bucket/northstar-pilot",
+    "retention_days": 30
+  },
+  "source": {
+    "host": "pilot.example.internal",
+    "os": "linux",
+    "criticality": "noncritical",
+    "owner": "example asset owner",
+    "approval_ref": "example change record",
+    "policy": "system_logs_metrics_only",
+    "response_actions_enabled": false,
+    "red_range_access": false
+  },
+  "operations": {
+    "on_call_owner": "example on-call owner",
+    "alert_route": "example approved incident channel",
+    "data_handling_reviewed": true
+  }
+}
