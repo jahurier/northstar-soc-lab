@@ -21,9 +21,12 @@ at most 5,000 cases and 64 KiB per line. Use local data handling appropriate
 to the alerts you import: this is a single-operator workbench, not a shared
 tenant boundary.
 
-```bash
-./quickstart.sh --no-sim --cases /path/to/alerts.jsonl
+```text
+python -m lab.workbench --no-sim --cases /path/to/alerts.jsonl
 ```
+
+On Windows, quote a path containing spaces, for example
+`--cases "C:\Data\SOC alerts\alerts.jsonl"`.
 
 **Triage** shows each imported case. Without a saved typed answer, Northstar
 shows a fixed `needs_context` placeholder and sends it to analyst review. It
@@ -36,9 +39,8 @@ the validated import replaces the prior imported set.
 
 If you have a separately produced Jev-style result file, use:
 
-```bash
-./quickstart.sh --no-sim --cases /path/to/alerts.jsonl \
-  --results /path/to/typed-results.jsonl
+```text
+python -m lab.workbench --no-sim --cases /path/to/alerts.jsonl --results /path/to/typed-results.jsonl
 ```
 
 Each result line needs `case_id`, `state_sha256`,
@@ -66,7 +68,7 @@ its typed answers, but policy reproduction reports a mismatch because there
 is no saved route to compare. The portable package does not include a Jev API
 runner; supplying `--results` makes no model or paid network call.
 
-## Quickstart options
+## Workbench options
 
 | Option | Effect |
 | --- | --- |

@@ -7,13 +7,17 @@ import http.client
 import json
 import threading
 
-from console import server
+from lab.workbench import parse_args, prepare
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--imported", action="store_true", help="check the reusable case-import example")
     args = parser.parse_args()
+    launcher_args = (["--no-sim", "--cases", "examples/cases.jsonl", "--results",
+                      "examples/typed-results.jsonl"] if args.imported else [])
+    prepare(parse_args(launcher_args))
+    from console import server  # read the portable paths after preparation
     store = server.Store()
     source = "imported" if args.imported else "simulated"
     assert sum(row["provenance"] == source for row in store.rows) > 0

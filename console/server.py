@@ -52,7 +52,7 @@ CORPUS_NAME = "replay-multi"
 CORPUS = JEV / "data" / f"{CORPUS_NAME}-alerts.jsonl"
 RESULTS = JEV / "artifacts" / f"{CORPUS_NAME}-results.jsonl"
 SIM_CASES = Path(os.environ.get("NORTHSTAR_SIM_CASES", str(REPO / "runs" / "world-cases.jsonl")))
-IMPORTED_CASES = REPO / "runs" / "imported-cases.jsonl"
+IMPORTED_CASES = Path(os.environ.get("NORTHSTAR_IMPORTED_CASES", str(REPO / "runs" / "imported-cases.jsonl")))
 EXTERNAL_RESULTS = Path(os.environ.get("NORTHSTAR_RESULTS", str(REPO / "runs" / "no-imported-results.jsonl")))
 SIM_RESULTS = JEV / "artifacts" / "world-sim-results.jsonl"
 SIM_REPORT = JEV / "artifacts" / "world-sim-report.json"
@@ -985,6 +985,9 @@ class Handler(BaseHTTPRequestHandler):
             if path == "/api/autopilot":
                 return self._json(HTTPStatus.OK, self.autopilot.control(body))
             if path == "/api/lab/shutdown":
+                if os.environ.get("NORTHSTAR_PORTABLE") == "1":
+                    threading.Thread(target=self.server.shutdown, daemon=True).start()
+                    return self._json(HTTPStatus.ACCEPTED, {"shutting_down": True})
                 # Detached so it can stop this server too; same token/Host/Origin guards as every POST.
                 log = open(REPO / "runs" / "lab-down.log", "w")
                 subprocess.Popen(["/bin/bash", str(REPO / "northstar.sh"), "down"], cwd=str(REPO),

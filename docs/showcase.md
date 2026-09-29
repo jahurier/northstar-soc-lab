@@ -17,9 +17,8 @@ not a recording of Jev's hidden internals or executing parallel agents.
 
 To see the same interaction without an account, run:
 
-```bash
-./quickstart.sh --no-sim --cases examples/cases.jsonl \
-  --results examples/typed-results.jsonl
+```text
+python -m lab.workbench --no-sim --cases examples/cases.jsonl --results examples/typed-results.jsonl
 ```
 
 The two example results are manually authored and marked `manual-example` in

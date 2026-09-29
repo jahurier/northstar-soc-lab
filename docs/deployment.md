@@ -1,13 +1,18 @@
 # Deployment requirements
 
-## Tier 1: portable offline demo
+## Tier 1: portable local workbench
 
-- Python 3.9 or newer and Bash on a local workstation.
+- Python 3.12 or newer on Windows, macOS, or Linux. Python 3.14 is recommended.
 - A browser able to reach `127.0.0.1:8787`.
-- Run `./quickstart.sh` for synthetic data, or `./quickstart.sh --no-sim
+- Run `python -m lab.workbench` for synthetic data, or `python -m lab.workbench --no-sim
   --cases /path/to/alerts.jsonl` for your own normalized alerts. Runtime
   data stays in ignored `runs/`.
 - No network service, account, model, or paid API call is required.
+
+The macOS/Linux `quickstart.sh` wrapper calls the same Python entrypoint.
+Install Python from [python.org](https://www.python.org/downloads/) if your
+machine lacks a supported version. On Windows, `py -3.14 -m lab.workbench` can
+select Python 3.14 explicitly.
 
 The console binds to loopback. It has a per-start token on mutating endpoints,
 checks the Host header, and exposes only a fixed job allowlist. It is intended

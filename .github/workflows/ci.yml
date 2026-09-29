@@ -1,31 +1,28 @@
-name: Portable workbench checks
+name: Cross-platform workbench checks
 on: [push, pull_request]
 jobs:
   smoke:
-    runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ['3.9', '3.12']
+        include:
+          - os: ubuntu-latest
+            python: '3.12'
+          - os: ubuntu-latest
+            python: '3.14'
+          - os: macos-latest
+            python: '3.14'
+          - os: windows-latest
+            python: '3.14'
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
-      - name: Check syntax and run the synthetic demo
-        env:
-          LAB_DATA: ${{ runner.temp }}/northstar-data
-          JEV_TEST: ${{ runner.temp }}/no-jev-test
+          python-version: ${{ matrix.python }}
+      - name: Validate scenarios and exercise the local workbench
         run: |
-          bash -n quickstart.sh northstar.sh
-          python -m sim.generate --date 2026-09-22 --seed 20260922
-          python -m lab.validate scenarios/*.json
+          python -m lab.validate scenarios/LAB-AI-001.json scenarios/LAB-AUTH-001.json scenarios/LAB-WEB-001.json
+          python -m lab.workbench --prepare-only
           python smoke.py
-      - name: Check a third-party case import and decision replay
-        env:
-          LAB_DATA: ${{ runner.temp }}/northstar-data
-          JEV_TEST: ${{ runner.temp }}/no-jev-test
-          NORTHSTAR_SIM_CASES: ${{ runner.temp }}/no-sim-cases.jsonl
-          NORTHSTAR_RESULTS: examples/typed-results.jsonl
-        run: |
-          python -m lab.import_cases --input examples/cases.jsonl
           python smoke.py --imported

@@ -1,6 +1,6 @@
 # Five-minute Northstar workbench walkthrough
 
-1. Run `./quickstart.sh` and open <http://127.0.0.1:8787>. The synthetic day
+1. Run `python -m lab.workbench` and open <http://127.0.0.1:8787>. The synthetic day
    contains 1,312 generated events and 25 detection cases at the pinned seed.
    These counts are simulation output, not detector performance.
 2. On **Overview**, point out the provenance cards. Recorded cases, Blue Watch,
@@ -20,7 +20,7 @@
    Explain that three attack cases and no blind production cohort cannot
    establish general accuracy or a model-to-model speedup.
 
-To demonstrate a reusable workflow, restart with `./quickstart.sh --no-sim
+To demonstrate a reusable workflow, restart with `python -m lab.workbench --no-sim
 --cases examples/cases.jsonl --results examples/typed-results.jsonl`. Overview
 now counts two imported cases. Triage holds unlabeled cases for review; the Jev
 decision map replays two **manually authored** typed results under the bundled
@@ -29,4 +29,4 @@ saved results. [User guide](user-guide.md) defines their format.
 
 The optional full local range adds Elastic and a disposable crAPI target after
 the pinned setup. Its status can be shown separately; it is not needed for this
-walkthrough and is never launched by `quickstart.sh`.
+walkthrough and is never launched by `lab.workbench`.
