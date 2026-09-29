@@ -866,7 +866,7 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(HTTPStatus.FORBIDDEN, {"error": "host not allowed"})
         path = urlparse(self.path).path
         if path in ("/", "/index.html"):
-            html = INDEX.read_text().replace("__DATA__", "null").replace("__TOKEN__", self.token)
+            html = INDEX.read_text(encoding="utf-8").replace("__DATA__", "null").replace("__TOKEN__", self.token)
             return self._send(HTTPStatus.OK, html.encode(), "text/html; charset=utf-8")
         if path == "/api/bootstrap":
             return self._json(HTTPStatus.OK, self.store.bootstrap())
