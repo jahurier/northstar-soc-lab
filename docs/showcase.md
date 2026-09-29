@@ -1,5 +1,15 @@
 # What the showcase actually shows
 
+The six [workbench screenshots](../README.md#inside-the-local-workbench) were
+captured on 2026-09-29 from the public checkout running
+`examples/cases.jsonl` and `examples/typed-results.jsonl` with `--no-sim`.
+The two alerts are unlabeled, and the typed results are manually authored.
+**Overview** shows their count and the separate saved comparison; **Triage**
+shows the independent review queue; **Console** is a modeled animation;
+**Control checks** lists individual stages; **Agents & tools** reports optional
+connections as inactive; and the example **decision map** shows a policy and
+human gate. No paid API request or host response happened during capture.
+
 The Overview separates recorded, imported, and synthetic case counts. Its
 comparison panel is a **reference** from one saved 23-case synthetic Jev
 experiment. Those numbers do not update when you import your own alerts and

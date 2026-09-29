@@ -841,6 +841,7 @@ function roundRect(x,y,w,h,r){ctx2.beginPath();ctx2.moveTo(x+r,y);ctx2.arcTo(x+w
 /* ---------- event lifecycle ---------- */
 function hop(p,to){p.from=p.to;p.to=to;p.t=0;}
 function spawn(){
+  if(!events.length&&!S.run)return;
   let e,runId=null;
   if(S.run){ if(!S.run.queue.length) return; e=S.run.queue.shift();runId=S.run.id;S.run.spawned++; }
   else { e=events[S.idx%events.length];S.idx++; }
@@ -963,6 +964,7 @@ document.addEventListener("keydown",(ev)=>{if(ev.key==="Escape")$("dClose").oncl
 function covColor(p){if(p<0.34)return "#5A2330";if(p<0.6)return "#8A4A2A";if(p<0.8)return "#B08A2E";return "#3E9E6F";}
 function renderCoverage(){
   const box=$("cov");
+  if(!Object.keys(D.coverage).length){box.append(el("p","empty","No recorded replay loaded; coverage is not measured here."));return;}
   for(const [ds,rows] of Object.entries(D.coverage)){
     let tot=0,med=0;const row=el("div","covrow");row.append(el("span","n",ds));const cells=el("div","cells");
     for(const [tac,n,any,m] of rows){tot+=n;med+=m;const c=el("span","cell");c.style.background=covColor(n?m/n:0);
@@ -971,7 +973,10 @@ function renderCoverage(){
   }
 }
 function renderNoise(){
-  const box=$("noise");const max=D.noisy_top[0].alerts;
+  const box=$("noise");
+  if(!D.noisy_top.length){$("noiseAux").textContent="No recorded benign baseline loaded";
+    box.append(el("p","empty","Benign noise is not measured in this portable session."));return;}
+  const max=D.noisy_top[0].alerts;
   $("noiseAux").textContent=`${D.benign_alerts.toLocaleString()} alerts · ${D.noisy_rule_count} rules · 2,239 benign logs`;
   for(const r of D.noisy_top){const nb=el("div","nb");const t=el("div","nt");
     t.append(el("span",null,r.rule),el("span",null,`${r.alerts.toLocaleString()} · ${r.level}`));
@@ -1904,9 +1909,9 @@ function tick(ts){
 layout();renderCoverage();renderNoise();
 if(window.ResizeObserver) new ResizeObserver(layout).observe(cv); else window.addEventListener("resize",layout);
 log("sys","BOOT",`loaded ${recordedCount.toLocaleString()} recorded Sigma detections and ${simCount.toLocaleString()} simulated Northstar cases`+(LOCAL?" · local console connected":""));
-for(let i=0;i<18;i++){const e=events[S.idx++];const p={e,from:"jev",to:"pol",t:1,judged:false};p.ans=simJev(e);p.dec=recommend(p.ans,e);p.judged=true;settle(p);
+for(let i=0;i<Math.min(18,events.length);i++){const e=events[S.idx++];const p={e,from:"jev",to:"pol",t:1,judged:false};p.ans=simJev(e);p.dec=recommend(p.ans,e);p.judged=true;settle(p);
   if(p.dec.recommendation==="escalate_for_containment_approval"){p.resp=responseFor(e,p.dec);if(i%3===0)queueGate(p);else execute(p,"approved by analyst");}}
-for(let i=0;i<6;i++){spawn();S.particles[S.particles.length-1].t=i*0.15;}
+if(events.length)for(let i=0;i<6;i++){spawn();S.particles[S.particles.length-1].t=i*0.15;}
 updateKpis();requestAnimationFrame(tick);
 {const v=location.hash.slice(1);if(v==="triage"||v==="agents"||((v==="showcase"||v==="jev-map"||v==="jobs"||v==="detections"||v==="campaigns"||v==="autopilot"||v==="controls"||v==="red-range")&&LOCAL))show(v);else if(LOCAL&&!v)show("showcase");}
 }

@@ -27,13 +27,17 @@ def main() -> None:
     thread = threading.Thread(target=httpd.serve_forever, daemon=True)
     thread.start()
     try:
-        for path in ("/", "/api/showcase", "/api/jev-map"):
+        for path in ("/", "/api/bootstrap", "/api/showcase", "/api/jev-map"):
             conn = http.client.HTTPConnection("127.0.0.1", port, timeout=10)
             conn.request("GET", path, headers={"Host": f"127.0.0.1:{port}"})
             response = conn.getresponse()
             body = response.read()
             conn.close()
             assert response.status == 200, (path, response.status)
+            if path == "/api/bootstrap":
+                bootstrap = json.loads(body)
+                assert bootstrap["totals"]["cases"] == len(bootstrap["events"])
+                assert bootstrap["totals"]["cases"] > 0
             if path == "/api/showcase":
                 showcase = json.loads(body)
                 assert showcase["environment"] == "local_test_lab"

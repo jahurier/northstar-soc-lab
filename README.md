@@ -10,19 +10,37 @@ did the decision layer return? Which rule routed the case? What did the analyst
 decide?* The console keeps those records separate and makes the route visible.
 It runs on one operator's machine and does not act on real hosts.
 
-## See the workflow
+## Inside the local workbench
 
-![Saved Jev decision map with typed outputs](docs/images/jev-decision-map.png)
+These screens come from the public checkout with its two supplied, unlabeled
+alerts and **manually authored** typed results. No model account, API call, or
+host action was involved in the capture.
 
-Choice, Score, and Noul answers feed a versioned shadow policy; a saved route
-is checked against the policy recomputation.
+| Overview: case provenance and a separate reference evaluation | Triage: analyst queue and selected case |
+| --- | --- |
+| ![Northstar Overview with imported-case counts and saved comparison](docs/images/overview.png) | ![Triage queue with a selected example case and typed judgments](docs/images/triage.png) |
 
-![Short replay across saved Jev decisions](docs/images/jev-decision-map.gif)
+| Console: modeled visual replay | Control checks: choose one validation stage |
+| --- | --- |
+| ![Modeled alert-to-policy pipeline in the local Console](docs/images/console-pipeline.png) | ![Control checks for simulation, policy, agents, and recorded replay](docs/images/control-checks.png) |
 
-These are captures of the maintainer's **saved 40-case Jev replay**, not hidden
-model internals or live parallel agents. The included example results are
-manually authored so the same review flow works without a Jev account.
-[Screenshot and data provenance](docs/showcase.md).
+| Agents & tools: current connection status | Decision map: example answer through policy and human gate |
+| --- | --- |
+| ![Agents and tools showing optional integrations inactive in the clean checkout](docs/images/agents-tools.png) | ![Manually authored example decision reaching policy verification and a human approval gate](docs/images/decision-map-example.png) |
+
+The Console animates **modeled outcomes**; its counter is not a record of host
+actions. The Agents view shows optional services as inactive on this clean
+install. The example decision map replays saved records marked `manual-example`.
+
+### Saved Jev API replay
+
+![Maintainer's saved Jev decision map with typed outputs](docs/images/jev-decision-map.png)
+
+![Short replay across the maintainer's saved Jev decisions](docs/images/jev-decision-map.gif)
+
+The image and animation above show the maintainer's separate **40-case saved
+Jev run**. They show decision records, not hidden model internals or live
+parallel agents. [Screenshot and data provenance](docs/showcase.md).
 
 ## Run it locally
 

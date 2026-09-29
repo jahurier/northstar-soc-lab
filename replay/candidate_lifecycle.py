@@ -28,6 +28,8 @@ ACTIVE = REPO / "detections" / "active"
 
 
 def candidates() -> list[dict[str, Any]]:
+    if not REGISTRY.is_file():
+        return []
     rows = json.loads(REGISTRY.read_text())["candidates"]
     active_ids = set((active_generation() or {}).get("candidates", []))
     for row in rows:
