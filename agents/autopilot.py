@@ -50,8 +50,7 @@ def _read_jsonl(path: Path) -> list[dict[str, Any]]:
 
 
 def _policy():
-    sys.path.insert(0, str(JEV))
-    from jev_security_eval.policy import POLICY_VERSION, recommend  # noqa: E402
+    from lab.shadow_policy import POLICY_VERSION, recommend
     return POLICY_VERSION, recommend
 
 

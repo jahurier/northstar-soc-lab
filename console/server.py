@@ -51,7 +51,9 @@ JEV = Path(os.environ.get("JEV_TEST", os.path.expanduser("~/Projects/jev-test"))
 CORPUS_NAME = "replay-multi"
 CORPUS = JEV / "data" / f"{CORPUS_NAME}-alerts.jsonl"
 RESULTS = JEV / "artifacts" / f"{CORPUS_NAME}-results.jsonl"
-SIM_CASES = REPO / "runs" / "world-cases.jsonl"
+SIM_CASES = Path(os.environ.get("NORTHSTAR_SIM_CASES", str(REPO / "runs" / "world-cases.jsonl")))
+IMPORTED_CASES = REPO / "runs" / "imported-cases.jsonl"
+EXTERNAL_RESULTS = Path(os.environ.get("NORTHSTAR_RESULTS", str(REPO / "runs" / "no-imported-results.jsonl")))
 SIM_RESULTS = JEV / "artifacts" / "world-sim-results.jsonl"
 SIM_REPORT = JEV / "artifacts" / "world-sim-report.json"
 INCIDENT_SINGLE_RESULTS = JEV / "artifacts" / "world-single-v2-results.jsonl"
@@ -197,6 +199,17 @@ def job_specs() -> dict[str, dict[str, Any]]:
                 "cwd": str(REPO), "cost": "free · full local replay", "confirm": "ACTIVATE",
                 "after": "detections", "after_internal": True,
             }
+    if not (JEV / "jev_security_eval").is_dir():
+        for name in tuple(specs):
+            if name.startswith("jev-") or name in {
+                "corpus", "policy-audit", "rescore", "blue-agent", "blue-agent-one"}:
+                specs.pop(name)
+    if not (REPO / "tests").is_dir():
+        specs.pop("tests")
+    if not Path(hayabusa.HAYABUSA_BIN).is_file():
+        for name in tuple(specs):
+            if name.startswith("sigma:"):
+                specs.pop(name)
     return specs
 
 
@@ -376,7 +389,7 @@ class Store:
         summary = load_summary()
         noisy_ids = set(summary["noisy_ids"])
         answers = {}
-        for results_path in (RESULTS, SIM_RESULTS):
+        for results_path in (RESULTS, SIM_RESULTS, EXTERNAL_RESULTS):
             if not results_path.exists():
                 continue
             with open(results_path) as handle:
@@ -385,10 +398,11 @@ class Store:
                     if (isinstance(row.get("response"), dict) and
                             row.get("question_version") == QUESTION_VERSION and
                             isinstance(row.get("state_sha256"), str)):
-                        answers[(row["case_id"], row["state_sha256"])] = row["response"]["answers"]
+                        answers[(row["case_id"], row["state_sha256"])] = (
+                            row["response"]["answers"], row["response"].get("model"))
         cases, rows = {}, []
         matched_answers = {}
-        for corpus in (CORPUS, SIM_CASES):
+        for corpus in (CORPUS, SIM_CASES, IMPORTED_CASES):
             if not corpus.exists():
                 continue
             with open(corpus) as handle:
@@ -399,15 +413,17 @@ class Store:
                     cases[case["case_id"]] = case
                     digest = hashlib.sha256(json.dumps(case["state"], sort_keys=True,
                                                        separators=(",", ":")).encode("utf-8")).hexdigest()
-                    answer = answers.get((case["case_id"], digest))
-                    if answer is not None:
-                        matched_answers[case["case_id"]] = answer
-                    rows.append(self._row(case, noisy_ids, answer))
+                    saved = answers.get((case["case_id"], digest))
+                    if saved is not None:
+                        matched_answers[case["case_id"]] = saved[0]
+                    rows.append(self._row(case, noisy_ids, saved[0] if saved else None,
+                                          saved[1] if saved else None))
         with self.lock:
             self.summary, self.cases, self.rows, self.answers = summary, cases, rows, matched_answers
 
     @staticmethod
-    def _row(case: dict[str, Any], noisy_ids: set[str], jev: dict[str, Any] | None) -> dict[str, Any]:
+    def _row(case: dict[str, Any], noisy_ids: set[str], jev: dict[str, Any] | None,
+             jev_model: str | None = None) -> dict[str, Any]:
         s, m = case["state"], case["metadata"]
         a, d = s["alert"], s["detection"]
         user = s["identity_context"].get("user")
@@ -421,7 +437,7 @@ class Store:
             "ch": a.get("channel"), "eid": a.get("event_id"), "src": a["source"], "ts": a.get("timestamp"),
             "snip": _snip(a.get("details") or {}), "inj": a.get("reviewer_note"),
             "noisy": d["rule_id"] in noisy_ids, "user": user[:40] if isinstance(user, str) else "",
-            "jev": jev,
+            "jev": jev, "jev_model": jev_model,
         }
 
     def bootstrap(self) -> dict[str, Any]:
@@ -437,6 +453,7 @@ class Store:
                 "benign_alerts": summary["benign_alerts"],
                 "coverage": summary["coverage"],
                 "totals": {"cases": len(rows), "recorded_cases": sum(r["provenance"] == "recorded" for r in rows),
+                           "imported_cases": sum(r["provenance"] == "imported" for r in rows),
                            "simulated_cases": sum(r["provenance"] == "simulated" for r in rows),
                            "attack_recordings": attack_recs, "med_any": med,
                            "real_jev": sum(r["jev"] is not None for r in rows)},
@@ -581,6 +598,7 @@ def showcase_view(store: Store, red_live: red_range_active.ActiveManager,
     with store.lock:
         recorded = sum(row["provenance"] == "recorded" for row in store.rows)
         simulated = sum(row["provenance"] == "simulated" for row in store.rows)
+        imported = sum(row["provenance"] == "imported" for row in store.rows)
         real_jev = sum(row["provenance"] == "recorded" and row["jev"] is not None
                        for row in store.rows)
     queue = json.loads(QUEUE.read_text())["cases"] if QUEUE.exists() else []
@@ -617,6 +635,9 @@ def showcase_view(store: Store, red_live: red_range_active.ActiveManager,
             "recorded": {"cases": recorded, "state_matched_jev": real_jev,
                          "triage_queue": len(queue),
                          "human_labels_in_queue": sum(row["case_id"] in labels for row in queue)},
+            "imported": {"cases": imported, "state_matched_jev": sum(
+                row["provenance"] == "imported" and row["jev"] is not None
+                for row in store.rows)},
             "simulated": {"cases": simulated, "last_cycle": {
                 "at": cycles[0].get("at"), "events": cycles[0].get("events"),
                 "planted_attacks": cycles[0].get("planted_attacks"),
@@ -664,7 +685,7 @@ def jev_map_view(store: Store, case_id: str | None = None) -> dict[str, Any]:
         case = cases[selected]
         digest = hashlib.sha256(json.dumps(case["state"], sort_keys=True,
                                            separators=(",", ":")).encode("utf-8")).hexdigest()
-        for path in (RESULTS, SIM_RESULTS):
+        for path in (RESULTS, SIM_RESULTS, EXTERNAL_RESULTS):
             if not path.exists():
                 continue
             with path.open() as handle:

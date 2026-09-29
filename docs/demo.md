@@ -1,4 +1,4 @@
-# Five-minute Northstar concept walkthrough
+# Five-minute Northstar workbench walkthrough
 
 1. Run `./quickstart.sh` and open <http://127.0.0.1:8787>. The synthetic day
    contains 1,312 generated events and 25 detection cases at the pinned seed.
@@ -19,6 +19,13 @@
    22/23 from whole chains. Compare p50 and p95 API latency and token totals.
    Explain that three attack cases and no blind production cohort cannot
    establish general accuracy or a model-to-model speedup.
+
+To demonstrate a reusable workflow, restart with `./quickstart.sh --no-sim
+--cases examples/cases.jsonl --results examples/typed-results.jsonl`. Overview
+now counts two imported cases. Triage holds unlabeled cases for review; the Jev
+decision map replays two **manually authored** typed results under the bundled
+shadow policy. Replace the example files with your own normalized alerts and
+saved results. [User guide](user-guide.md) defines their format.
 
 The optional full local range adds Elastic and a disposable crAPI target after
 the pinned setup. Its status can be shown separately; it is not needed for this

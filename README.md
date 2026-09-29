@@ -1,76 +1,97 @@
 # Northstar SOC Lab
 
-Northstar is a local security-operations **concept lab**. It asks a practical
-question: can a typed decision layer help a small SOC route alerts, compare
-evidence, and propose next steps while deterministic policy and a human retain
-control of consequential actions?
+**A free, local workbench for reviewing security alerts and tracing typed
+decisions.** Import your own alert records, replay saved Jev-style answers,
+inspect the shadow-policy route, and record an independent analyst verdict.
+The default synthetic company day is a sample project, not a requirement.
 
-The lab combines a synthetic company day, recorded-detection adapters, Jev
-triage integration, a shadow policy, an analyst queue, a local blue-model note,
-and an optional disposable crAPI range. The console makes provenance and held
-actions visible. It is a test environment, not a production SOC or an autonomous
-response system.
+Northstar keeps case evidence, model judgments, policy, and human labels
+separate. The console shows what was supplied, what the decision layer said,
+why policy held or routed a case, and whether the saved decision still matches
+the case state. It does not contain or change a real host.
 
-## Run the portable concept demo
+![Jev decision map replaying a saved, state-matched result](docs/images/jev-decision-map.png)
 
-Requires Python 3.9 or newer, Bash, and a local browser. No API account, Docker,
-Ollama, downloaded datasets, or credentials are needed for this tier.
+![Short decision-map replay from the saved Jev run](docs/images/jev-decision-map.gif)
+
+The image and animation show the maintainer's saved Jev run over recorded
+replay cases. They show decision records, not hidden model internals. The included
+`examples/` files use **manually authored** typed answers so anyone can try
+the flow without a model account. [See the showcase guide](docs/showcase.md).
+
+## Try it in five minutes
+
+Requires Python 3.9+, Bash, and a browser on macOS or Linux. The core demo has
+no package install, Docker, model download, account, or paid API call.
 
 ```bash
+git clone https://github.com/jahurier/northstar-soc-lab.git
+cd northstar-soc-lab
 ./quickstart.sh
 ```
 
-Open <http://127.0.0.1:8787>. The script generates a deterministic synthetic
-company day, then serves the console on loopback. Press Ctrl+C to stop it. The
-**Console** visual uses modeled answers for demonstration. The **Jev decision
-map** requires separately saved, state-matched Jev API answers and is empty in
-the data-free public snapshot. No paid call starts during quickstart.
+Open <http://127.0.0.1:8787>. Press Ctrl+C to stop. This starts a local,
+deterministic synthetic day. Change the seed or omit planted scenarios with
+`./quickstart.sh --seed 42` or `./quickstart.sh --no-attacks`.
 
-## What is in the system
+To try the **bring-your-own-cases** path with two supplied, unlabeled alerts:
 
-| Layer | Role | Default public-demo state |
+```bash
+./quickstart.sh --no-sim --cases examples/cases.jsonl \
+  --results examples/typed-results.jsonl
+```
+
+Open **Overview** for the imported-case count, **Triage** for the case table,
+and **Jev decision map** for the two saved typed routes. The result file is
+marked `manual-example`; it makes no Jev API call and is not an accuracy test.
+The workbench serves only `127.0.0.1`. If port 8787 is occupied, add
+`--port 8788` and open that port instead.
+
+## Use your own data
+
+1. Convert alerts to the [nine-field JSONL format](docs/user-guide.md). The
+   importer rejects truth labels and marks the cases **unlabeled**.
+2. Run `./quickstart.sh --no-sim --cases /path/to/alerts.jsonl`. Inspect and
+   label cases in **Triage**; labels stay in ignored local files.
+3. If you have a separately produced typed-result JSONL file, add
+   `--results /path/to/results.jsonl`. Results must match the case ID, exact
+   state SHA-256, and question version. The decision map then replays the
+   result and checks the bundled `shadow-v4` policy. [Result format and
+   workflow](docs/user-guide.md).
+
+The free package supplies import, review, simulation, policy replay, and the
+console. It does **not** bundle a Jev API runner or make paid calls. Local
+Ollama notes, recorded telemetry replay, Elastic, and the disposable crAPI
+range are optional integrations with separate setup.
+
+## What you can inspect
+
+| Area | Clean install | With your own data |
 | --- | --- | --- |
-| Company simulator | Generates routine activity, benign lookalikes, and fixed synthetic scenarios | Available offline |
-| Detection/replay adapters | Process recorded telemetry when datasets and Hayabusa are installed | No recorded data included |
-| Jev | Returns typed Choice, Score, and Noul judgments for case state | Optional separate integration; no results bundled |
-| Shadow policy | Applies conservative thresholds and trusted-source queue fallback | Proposes only; never contains or closes |
-| Analyst queue | Holds independent human verdicts | Empty on a fresh install |
-| Blue agent/Watch | Local-model proposals and post-run summary | Optional Ollama; no action execution |
-| Elastic and crAPI range | Optional local evidence and isolated disposable target | Not started by quickstart |
+| Synthetic simulator | Seeded company day and planted truth in a separate file | Change seed/date or turn off |
+| Case workbench | Sample cases and modeled browser flow | Import unlabeled alert JSONL |
+| Decision map | Empty by default | Replay state-matched typed results |
+| Shadow policy | Bundled, non-executing `shadow-v4` | Recompute and compare each saved route |
+| Analyst review | Empty local ledger | Save independent verdicts |
+| Blue/Red/Elastic | Inactive | Optional local model, passive replay, isolated range |
 
-See [architecture](docs/architecture.md), [deployment requirements](docs/deployment.md),
-the [five-minute walkthrough](docs/demo.md), [measured results](docs/results.md), and
-[safety and evidence rules](docs/safety-and-evidence.md).
+The [architecture](docs/architecture.md), [deployment requirements](docs/deployment.md),
+[safety and evidence rules](docs/safety-and-evidence.md), and
+[five-minute walkthrough](docs/demo.md) explain each layer.
 
-## Saved comparison snapshot
+## Reference result, not a product benchmark
 
-On the **same 23 planted synthetic cases**, a saved Jev run compared one alert
-with whole-chain context. These are small, inspected lab results, not a
-production accuracy or cross-model benchmark.
+On the **same 23 planted synthetic cases**, a saved Jev run classified 21/23
+correctly from single alerts and 22/23 with whole-chain context. Median saved
+API latency was 304.3 ms and 289.0 ms respectively; p95 was 733.4 ms and
+801.7 ms. [Definitions, token counts, and limits](docs/results.md) are in the
+published aggregate. This small, inspected cohort does not measure your data,
+production accuracy, end-to-end SOC speed, or a cross-model advantage.
 
-| Measure | Single alert | Whole chain |
-| --- | ---: | ---: |
-| Correct disposition on planted cases | 21/23 | 22/23 |
-| Planted malicious classified likely malicious | 1/3 | 2/3 |
-| Planted benign classified likely benign | 20/20 | 20/20 |
-| Median saved API latency | 304.3 ms | 289.0 ms |
-| p95 saved API latency | 733.4 ms | 801.7 ms |
+## License and scope
 
-The [full comparison](docs/results.md) defines correctness, shows token use,
-and explains the limits of a 23-case synthetic sample. No response was
-executed against a host.
-
-## What this demonstrates
-
-The browser can show how one case becomes typed judgments, how policy routes
-those judgments, what is held for analyst or approval, and whether the current
-policy reproduces a saved decision. The saved-cohort animation shows case
-records, not hundreds of executing agents. Northstar does **not** establish
-claims about production detection accuracy, autonomous containment, or speed
-and cost relative to another agent system.
-
-This snapshot intentionally excludes private Git history, local run evidence,
-human and model review files, raw recordings, saved API responses, `.env` files,
-and credentials. Runtime queue, label, proposal, and tuning files are ignored by
-Git; `adjudications/queue.example.json` shows the empty format. No reuse
-license has been selected.
+Northstar source is released under [Apache-2.0](LICENSE). Optional tools,
+models, Docker images, and recorded datasets have their own licenses and are
+not redistributed here. This is a single-operator local workbench, not a
+hosted multi-user SOC or an autonomous containment system. See the
+[deployment guide](docs/deployment.md) before enabling optional integrations.

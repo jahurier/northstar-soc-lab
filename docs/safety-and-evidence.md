@@ -11,10 +11,12 @@ Northstar keeps evidence classes separate:
 | Human adjudication | Explicit analyst verdict in its own append-only ledger |
 | Shadow-policy route | A recommendation and queue, not an executed action |
 
-The public snapshot has no analyst queue or ledger. An empty queue example is
-provided; runtime adjudication files are ignored by Git. It omits local review
-artifacts and raw recordings. Do not infer accuracy or production readiness
-from browser demo answers, planted cases, or a small inspected cohort.
+The public package starts with an empty analyst queue and ledger. An empty
+queue example is provided; runtime adjudication files are ignored by Git.
+Imported cases are unlabeled, and the manually authored typed-result example
+is not model performance evidence. The package omits local review artifacts
+and raw recordings. Do not infer accuracy or production readiness from browser
+demo answers, planted cases, or a small inspected cohort.
 
 The simulator and passive replay do not run commands against hosts. The optional
 crAPI range uses a disposable target, pinned tools, a bounded runtime, and an
@@ -25,7 +27,7 @@ Jev API use is optional and paid. Do not run a paid cohort as part of installati
 or CI. Keep API credentials in local secret storage, outside this repository;
 never put them in examples, screenshots, logs, issues, or commits.
 
-Public release review should check the fresh export, not the development Git
-tree. The export deliberately has no prior commit authors or remotes. Before
-publication, choose a license and review upstream notices for optional datasets,
-models, images, templates, and scanner components.
+Public release review checks the fresh export, not the development Git tree.
+The export deliberately has no prior commit authors or remotes. Northstar's
+own source is Apache-2.0; optional datasets, models, images, templates, and
+scanner components retain their upstream licenses.

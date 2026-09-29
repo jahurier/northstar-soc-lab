@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import http.client
 import json
 import threading
@@ -10,8 +11,12 @@ from console import server
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--imported", action="store_true", help="check the reusable case-import example")
+    args = parser.parse_args()
     store = server.Store()
-    assert sum(row["provenance"] == "simulated" for row in store.rows) > 0
+    source = "imported" if args.imported else "simulated"
+    assert sum(row["provenance"] == source for row in store.rows) > 0
     httpd = server.make_server(0)
     port = httpd.server_address[1]
     server.Handler.port = port
@@ -30,13 +35,23 @@ def main() -> None:
                 assert showcase["environment"] == "local_test_lab"
                 assert showcase["saved_comparison"]["cases"] == 23
                 assert showcase["saved_comparison"]["arms"]["chain"]["correct"] == 22
+                if args.imported:
+                    assert showcase["imported"]["cases"] == 2
+                    assert showcase["imported"]["state_matched_jev"] == 2
             if path == "/api/jev-map":
-                assert json.loads(body)["catalog"] == []
+                decision_map = json.loads(body)
+                if args.imported:
+                    assert len(decision_map["catalog"]) == 2
+                    assert decision_map["selected"]["model"] == "manual-example"
+                    assert decision_map["selected"]["verification"]["policy_match"]
+                else:
+                    assert decision_map["catalog"] == []
     finally:
         httpd.shutdown()
         httpd.server_close()
         thread.join(timeout=5)
-    print("offline console and API smoke test passed")
+    print("imported-case review smoke test passed" if args.imported else
+          "offline console and API smoke test passed")
 
 
 if __name__ == "__main__":

@@ -354,7 +354,7 @@ pre.json{font:400 11px var(--mono);background:#0B111C;border:1px solid var(--lin
 
 <div class="wrap">
   <header class="bar">
-    <div class="brand"><h1>Northstar <span>SOC</span></h1><small id="connLabel">autonomous purple-team replay</small></div>
+    <div class="brand"><h1>Northstar <span>SOC</span></h1><small id="connLabel">local SOC decision workbench</small></div>
     <nav class="tabs" aria-label="Views">
       <button data-view="showcase" aria-pressed="false" id="showcaseTab" hidden>Overview</button>
       <button data-view="console" aria-pressed="true">Console</button>
@@ -411,10 +411,10 @@ pre.json{font:400 11px var(--mono);background:#0B111C;border:1px solid var(--lin
 
   <div class="view" id="view-jev-map" hidden>
     <section class="panel">
-      <div class="ph"><h2>Jev decision map</h2><span class="pill real">saved API answers</span><span class="aux" id="jevMapAux">Loading cases…</span></div>
-      <div class="explain">Replay state-matched Jev answers without making a new API call. <b>Case route</b> shows the eight typed outputs, saved policy, route gates, and policy verification. <b>Saved cohort</b> fans the available cases across Choice, Score, and Noul outputs, then merges the decision records. Each dot is a saved case, not an executing agent. No per-case Blue Watch or host action is dispatched. The map does not reveal Jev's hidden internal reasoning.</div>
+      <div class="ph"><h2>Jev decision map</h2><span class="pill real">saved typed answers</span><span class="aux" id="jevMapAux">Loading cases…</span></div>
+      <div class="explain">Replay state-matched typed answers without making a new API call. The bundled example is manually authored; imported results identify their own model. <b>Case route</b> shows the eight typed outputs, saved policy, route gates, and policy verification. <b>Saved cohort</b> fans the available cases across Choice, Score, and Noul outputs, then merges the decision records. Each dot is a saved case, not an executing agent. No per-case Blue Watch or host action is dispatched. The map does not reveal Jev's hidden internal reasoning.</div>
       <div class="jev-modebar"><button class="btn sm" id="jevModeCase" type="button" aria-pressed="true">Case route</button><button class="btn sm" id="jevModeCohort" type="button" aria-pressed="false">Saved cohort</button></div>
-      <div class="jev-controls"><label for="jevMapFilter">Source</label><select id="jevMapFilter"><option value="all">Recorded + simulated</option><option value="recorded">Recorded</option><option value="simulated">Simulated</option></select>
+      <div class="jev-controls"><label for="jevMapFilter">Source</label><select id="jevMapFilter"><option value="all">All sources</option><option value="recorded">Recorded</option><option value="simulated">Simulated</option><option value="imported">Imported</option></select>
         <label for="jevMapCase">Case</label><select id="jevMapCase"></select>
         <button class="btn sm" id="jevMapNext" type="button">Next case</button><button class="btn sm" id="jevMapPlay" type="button">Play saved decisions</button></div>
       <div class="jev-metrics" id="jevMapMetrics"></div>
@@ -515,7 +515,7 @@ pre.json{font:400 11px var(--mono);background:#0B111C;border:1px solid var(--lin
 
   <div class="view" id="view-triage" hidden>
     <section class="panel explain">
-      <p><b>How to read Triage:</b> The detection rule found an alert. <b>Jev verdict</b> is either a real API answer or a <b>Demo estimate</b> generated from the dataset label. <b>Policy action</b> is the local shadow-v4 recommendation; it has not changed an endpoint. <b>Queue</b> is the specialist destination. <b>Your verdict</b> is the analyst label you save.</p>
+      <p><b>How to read Triage:</b> The detection rule found an alert. A typed verdict is a state-matched saved result, a modeled answer on labeled demo data, or a conservative needs-context placeholder on unlabeled imports. <b>Policy action</b> is the local shadow-v4 recommendation; it has not changed an endpoint. <b>Queue</b> is the specialist destination. <b>Your verdict</b> is the analyst label you save.</p>
       <p><b>Malicious</b> = evidence supports attacker behavior; <b>Benign</b> = authorized activity; <b>Needs context</b> = meaningful alert, more evidence needed; <b>Unsupported</b> = alert does not support a meaningful judgment. Recorded dataset labels are weak labels; Northstar world labels are synthetic ground truth. Reveal ground truth in the header when you want to compare.</p>
       <p id="triageEval"></p>
     </section>
@@ -526,7 +526,7 @@ pre.json{font:400 11px var(--mono);background:#0B111C;border:1px solid var(--lin
         <label class="field" for="fRec"><span>Recommendation</span><select id="fRec"><option value="">All</option><option value="escalate_for_containment_approval">Escalate</option><option value="analyst_review">Analyst review</option><option value="route_and_tag">Route + tag</option><option value="analyst_review_low_priority">Low priority</option></select></label>
         <label class="field" for="fDs"><span>Dataset</span><select id="fDs"><option value="">All</option></select></label>
         <label class="field" for="fQueue"><span>Queue</span><select id="fQueue"><option value="">All</option><option>endpoint</option><option>identity</option><option>threat_hunting</option><option>other</option></select></label>
-        <label class="field" for="fAdj"><span>Review filter</span><select id="fAdj"><option value="">All</option><option value="queue_todo" selected>Queue · awaiting verdict</option><option value="queue">Adjudication queue</option><option value="skipped">Skipped for later</option><option value="todo">Not yet labeled</option><option value="done">Labeled</option><option value="disagree">Analyst ≠ real Jev</option><option value="truth_miss">Real Jev ≠ planted truth</option></select></label>
+        <label class="field" for="fAdj"><span>Review filter</span><select id="fAdj"><option value="">All</option><option value="queue_todo" selected>Queue · awaiting verdict</option><option value="queue">Adjudication queue</option><option value="skipped">Skipped for later</option><option value="todo">Not yet labeled</option><option value="done">Labeled</option><option value="disagree">Analyst ≠ saved answer</option><option value="truth_miss">Saved Jev ≠ planted truth</option></select></label>
         <label class="toggle" for="fInj"><input type="checkbox" id="fInj"> Injected only</label>
       </div>
     </section>
@@ -569,7 +569,7 @@ pre.json{font:400 11px var(--mono);background:#0B111C;border:1px solid var(--lin
   <div class="view" id="view-controls" hidden>
     <section class="panel">
       <div class="ph"><h2>Check one stage at a time</h2><span class="aux" id="controlAux"></span></div>
-      <div class="explain">Start with a scope check, then choose a passive simulation or recorded replay. Each button runs only its named stage or opens the relevant view. Results appear in Lab jobs or the linked view. Browser simulation uses modeled Jev answers; only state-matched saved API answers count as real Jev evidence. No live target or response action is available here.</div>
+      <div class="explain">Start with a scope check, then choose a passive simulation or recorded replay. Each button runs only its named stage or opens the relevant view. Results appear in Lab jobs or the linked view. Browser simulation uses modeled answers; only state-matched saved API answers count as Jev evidence. No response action is available here.</div>
       <div class="jobgrid" id="controlGrid"></div>
     </section>
     <section class="panel">
@@ -699,6 +699,11 @@ const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 /* ---------- simulated Jev answers (clearly modeled, not measured) ---------- */
 function simJev(e){
   if(e.jev) return e.jev;
+  if(e.label!=="attack"&&e.label!=="benign") return {
+    disposition:{choice:"needs_context",confidence:0},review_queue:{choice:e.src,confidence:0},
+    malicious_behavior_supported:{noul:0},legitimate_admin_plausible:{noul:0},
+    additional_context_required:{noul:1},untrusted_instructions_present:{noul:0},
+    evidence_strength:{score:0},potential_impact:{score:0}};
   const r=rng(hash(e.id)); const n=()=>(r()-0.5)*0.2;
   const attack=e.label==="attack"; const hi=e.lvl==="high"||e.lvl==="crit";
   let disp,conf,mal,admin,ctx;
@@ -809,7 +814,7 @@ function draw(ts){
   for(const p of S.particles){
     const path=edgePath(p.from,p.to);const [x,y]=bez(path,p.t);
     let col=C.text;
-    if(S.truth) col=p.e.label==="attack"?C.red:C.good;
+    if(S.truth) col=p.e.label==="attack"?C.red:p.e.label==="benign"?C.good:C.text;
     else if(p.judged) col=p.dec.recommendation==="escalate_for_containment_approval"?C.red:(p.dec.recommendation==="analyst_review_low_priority"?C.good:(p.dec.recommendation==="route_and_tag"?C.blue:C.warn));
     else if(p.from==="red") col=C.red;
     ctx2.beginPath();ctx2.arc(x,y,p.e.inj?4.2:3.2,0,Math.PI*2);ctx2.fillStyle=col;ctx2.shadowColor=col;ctx2.shadowBlur=reduce?0:10;ctx2.fill();ctx2.shadowBlur=0;
@@ -862,7 +867,7 @@ function arrive(p){
 function settle(p){
   const e=p.e,d=p.dec,k=S.k;k.proc++;S.n++;
   if(e.label==="attack"){k.att++;if(d.recommendation!=="analyst_review_low_priority")k.attCaught++;}
-  else{k.ben++;if(d.recommendation==="escalate_for_containment_approval")k.benEsc++;}
+  else if(e.label==="benign"){k.ben++;if(d.recommendation==="escalate_for_containment_approval")k.benEsc++;}
   if(e.inj){k.inj++;if(d.basis==="alert_source"&&d.recommendation!=="analyst_review_low_priority")k.injContained++;
     log("gov","POLICY",`injection ${(p.ans.untrusted_instructions_present.noul*100|0)}% · model queue “${p.ans.review_queue.choice}” overridden → ${d.queue} (${d.basis})`);}
   if(S.run&&p.runId===S.run.id){S.run.done++;if(d.recommendation==="escalate_for_containment_approval")S.run.gated++;progress();if(S.run.done>=S.run.total)finishRun();}
@@ -906,10 +911,10 @@ function addFeed(p){
   li.append(el("div","sev"));const b=el("div","body");
   const r1=el("div","r1");r1.append(el("span","rule",e.rule),el("span","t",(e.ts||"").slice(0,19).replace("T"," ")));
   const r2=el("div","r2");r2.append(el("span","chip "+cls,lbl),el("span","chip",e.ds),
-    el("span","chip",e.provenance==="simulated"?"simulated":"recorded"),
+    el("span","chip",e.provenance||"recorded"),
     el("span",null,(e.host||"—")+" · "+e.ch+" "+e.eid));
   if(e.inj) r2.append(el("span","chip inj","injected"));
-  if(S.truth) r2.append(el("span","chip "+(e.label==="attack"?"truth-a":"truth-b"),e.label));
+  if(S.truth&&e.label!=="unlabeled") r2.append(el("span","chip "+(e.label==="attack"?"truth-a":"truth-b"),e.label));
   b.append(r1,r2);li.append(b);
   li.onclick=()=>openDrawer(p);li.onkeydown=(ev)=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();openDrawer(p);}};
   const f=$("feed");f.prepend(li);while(f.children.length>80)f.lastChild.remove();
@@ -1069,22 +1074,23 @@ const hitAttack=worldAttacks.filter(correct).length,hitBenign=worldBenign.filter
 const unsupported=worldTested.filter(e=>e.jev.disposition.choice==="unsupported").length;
 const queueCorrect=worldTested.filter(e=>e.jev.review_queue.choice===e.src).length;
 const pairedEval=D.incident_evaluation;
-$("agentStatus").textContent=`${realJev.toLocaleString()} of ${events.length.toLocaleString()} cases have saved real Jev API answers (${worldTested.length} Northstar world cases). The other cases show demo estimates derived from dataset labels. All red/blue agent actions and approvals in this browser are replay only.`;
+$("agentStatus").textContent=`${realJev.toLocaleString()} of ${events.length.toLocaleString()} cases have state-matched saved typed answers (${worldTested.length} planted synthetic cases). Unanswered imports are held for context; labeled demo cases use modeled estimates. Browser red/blue actions and approvals are replay only.`;
 $("jevEval").textContent=pairedEval?
   `Paired Northstar incident test: ${pairedEval.paired} real Jev case pairs. Malicious correctly called: ${pairedEval.single_attack_correct}/${pairedEval.attack_total} as single alerts and ${pairedEval.chain_attack_correct}/${pairedEval.attack_total} with whole-chain context. Benign correctly called: ${pairedEval.single_benign_correct}/${pairedEval.benign_total} single and ${pairedEval.chain_benign_correct}/${pairedEval.benign_total} with context. This small planted-truth smoke test does not establish production accuracy. The triage table still shows the earlier world run; recorded dataset labels are weak and need independent review.`:worldTested.length?
   `Northstar synthetic truth: ${worldTested.length} real Jev responses. Exact disposition ${hitAttack+hitBenign}/${worldTested.length}; malicious recall ${hitAttack}/${worldAttacks.length}; benign accuracy ${hitBenign}/${worldBenign.length}; queue accuracy ${queueCorrect}/${worldTested.length}; unsupported verdicts ${unsupported}/${worldTested.length}. This is a small seeded smoke test, not a production performance claim. Recorded dataset labels are weak; an independent analyst review or confirmed incident outcome is needed to score them reliably.`:
-  "No real Jev responses on synthetic Northstar cases are loaded yet. Run the Jev world evaluation in Lab jobs, then reload data. Synthetic cases provide planted truth; recorded labels require independent analyst review.";
+  "No Jev API responses on planted synthetic cases are loaded. The saved comparison on Overview is a separate reference experiment. Imported cases require independent analyst review.";
 $("triageEval").textContent=pairedEval?`Paired planted-truth test: malicious calls ${pairedEval.single_attack_correct}/${pairedEval.attack_total} single → ${pairedEval.chain_attack_correct}/${pairedEval.attack_total} chain; benign calls ${pairedEval.single_benign_correct}/${pairedEval.benign_total} single → ${pairedEval.chain_benign_correct}/${pairedEval.benign_total} chain. Table below still uses the earlier world run.`:
-  worldTested.length?`Real Jev on planted Northstar truth: malicious recall ${hitAttack}/${worldAttacks.length}, benign accuracy ${hitBenign}/${worldBenign.length}, unsupported ${unsupported}/${worldTested.length}. See Agents & tools for scope.`:"No real Jev world results are loaded; all current Jev verdicts are demo estimates.";
+  worldTested.length?`Real Jev on planted Northstar truth: malicious recall ${hitAttack}/${worldAttacks.length}, benign accuracy ${hitBenign}/${worldBenign.length}, unsupported ${unsupported}/${worldTested.length}. See Agents & tools for scope.`:"No planted-truth Jev evaluation is loaded. Imported cases are unlabeled; their saved answers are for review, not scored as accuracy.";
 $("noticeReal").innerHTML="";
-const simCount=events.filter(e=>e.provenance==="simulated").length, recordedCount=events.length-simCount;
-$("noticeReal").append(el("b",null,`${recordedCount.toLocaleString()} recorded detections`),
-  document.createTextNode(simCount?` + ${simCount.toLocaleString()} simulated Northstar cases. Coverage and noise panels measure recorded datasets only.`:
-    " from 6 public datasets. Coverage and noise panels measure recorded datasets."));
-$("noticeSim").textContent=realJev?`${realJev.toLocaleString()} cases use real Jev answers; the rest are modeled from ground truth for visualization, not evaluation. The shadow-v4 policy is ported.`:
-  "Jev answers are modeled from ground truth for visualization, not evaluation. The shadow-v4 policy is ported.";
-if(realJev===events.length){$("simPill").textContent="real jev";$("simPill").className="pill real";}
-$("connLabel").textContent=LOCAL?"local console · 127.0.0.1":"autonomous purple-team replay";
+const simCount=events.filter(e=>e.provenance==="simulated").length,
+  recordedCount=events.filter(e=>e.provenance==="recorded").length,
+  importedCount=events.filter(e=>e.provenance==="imported").length;
+$("noticeReal").append(el("b",null,`${recordedCount.toLocaleString()} recorded · ${importedCount.toLocaleString()} imported · ${simCount.toLocaleString()} simulated cases`),
+  document.createTextNode(". Imported cases have no ground-truth label; coverage and noise panels measure recorded datasets only."));
+$("noticeSim").textContent=realJev?`${realJev.toLocaleString()} cases have state-matched saved typed answers. Unanswered imported cases receive a conservative needs-context placeholder; demo estimates on labeled cases are not evaluation.`:
+  "No saved typed answers loaded. Imported cases receive a conservative needs-context placeholder; estimates on labeled cases are for visualization only.";
+if(realJev&&realJev===events.length){$("simPill").textContent="saved answers";$("simPill").className="pill real";}
+$("connLabel").textContent=LOCAL?"local SOC decision workbench · 127.0.0.1":"local SOC decision workbench";
 $("jobsTab").hidden=!LOCAL;
 $("showcaseTab").hidden=!LOCAL;
 $("jevMapTab").hidden=!LOCAL;
@@ -1139,9 +1145,10 @@ function renderComparison(saved){const box=$("showcaseComparison");box.textConte
 }
 function renderShowcase(data){showcaseData=data;$("showcaseAux").textContent="Saved evidence · refresh to update";
   const box=$("showcaseCards");box.textContent="";
-  const r=data.recorded,s=data.simulated,red=data.red_range,b=data.blue_watch,p=data.local_pilot;
+  const r=data.recorded,s=data.simulated,i=data.imported,red=data.red_range,b=data.blue_watch,p=data.local_pilot;
   box.append(
     overviewCard("recorded","Recorded cases",r.cases.toLocaleString(),`${r.state_matched_jev.toLocaleString()} state-matched saved Jev answers · ${r.human_labels_in_queue}/${r.triage_queue} queue labels`,"triage","Inspect Triage"),
+    overviewCard("imported","Your cases",i.cases.toLocaleString(),`${i.state_matched_jev} state-matched typed answers · unlabeled until reviewed`,"triage","Inspect Triage"),
     overviewCard("simulated","Company-day cases",s.cases.toLocaleString(),s.last_cycle?`Last autonomous cycle: ${s.last_cycle.events} synthetic events · ${s.last_cycle.planted_attacks} planted attacks`:"No saved autonomous cycle yet", "autopilot","Inspect Autopilot"),
     overviewCard("isolated live","crAPI Red Range",red?red.status:"No run",red?`${red.run_id} · Elastic ${red.elastic||"unknown"} · ${red.report_files} report files`:"Only the disposable target is eligible; no business host is targeted", "red-range","Inspect Red Range"),
     overviewCard("model note","Blue Watch",b.notes+" recent",b.latest?`${b.latest.run_id} · ${b.latest.events} aggregate events · ${b.latest.execution_status}`:"No post-run note saved", "agents","Inspect Blue response"),
@@ -1221,7 +1228,7 @@ function renderJevGraph(){const svg=$("jevMapSvg");svg.textContent="";if(!jevDet
     jevEdge(svg,"policy",route.id,route.id,status);jevEdge(svg,route.id,"verification",route.id,status);}
   jevEdge(svg,"verification","outcome","verification",v.policy_match?"route":"held");
   jevNode(svg,"case","Saved case",jevDetail.provenance+" · "+jevDetail.alert_source,"case");
-  jevNode(svg,"model","Jev typed judgments",jevDetail.model||"saved API result","core");
+  jevNode(svg,"model","Typed judgments",jevDetail.model||"saved result","core");
   for(const [key,title] of jevSignals)jevNode(svg,key,title,jevValue(key,a[key]),"signal");
   jevNode(svg,"policy","Saved shadow policy",p.reason||"routing decision","policy");
   for(const route of jevDetail.routes){const title={queue:"Specialist queue",blue:"Blue Watch",approval:"Approval gate",response:"Host response"}[route.id];
@@ -1236,9 +1243,9 @@ function renderJevGraph(){const svg=$("jevMapSvg");svg.textContent="";if(!jevDet
     if(a[jevFocus]?.probabilities)info.append(el("pre","snip",JSON.stringify(a[jevFocus].probabilities,null,2)));}
   else{const route=jevDetail.routes.find(item=>item.id===jevFocus);
     info.append(el("h3",null,route?{queue:"Specialist queue",blue:"Blue Watch",approval:"Approval gate",response:"Host response"}[route.id]:
-      jevFocus==="case"?"Saved case":jevFocus==="model"?"Jev API result":jevFocus==="policy"?"Saved policy route":jevFocus==="verification"?"Decision verification":"Proposed next state"),
+      jevFocus==="case"?"Saved case":jevFocus==="model"?"Saved typed result":jevFocus==="policy"?"Saved policy route":jevFocus==="verification"?"Decision verification":"Proposed next state"),
       el("p",null,route?`${route.status} · ${route.detail}`:jevFocus==="case"?`${jevDetail.rule} · ${jevDetail.provenance}`:
-        jevFocus==="model"?"Eight typed outputs from one saved, state-matched API response.":
+        jevFocus==="model"?`Eight typed outputs from ${jevDetail.model||"an unspecified source"}, matched to this case state.`:
         jevFocus==="verification"?`State hash matched: ${v.state_hash_match} · question version matched: ${v.question_version_match} · current ${v.current_policy_version} reproduced saved policy: ${v.policy_match}`:
         jevFocus==="outcome"?"Decision record saved; no agent or host action executed.":p.reason||"No policy reason saved."));}
   const policy=$("jevMapPolicy");policy.textContent="";policy.append(el("h3",null,"Saved policy outcome"),
@@ -1246,7 +1253,7 @@ function renderJevGraph(){const svg=$("jevMapSvg");svg.textContent="";if(!jevDet
     el("p",null,`Reason: ${p.reason||"not saved"}`),el("p",null,`Queue basis: ${p.queue_basis||"not saved"}`),
     el("p",null,`Case state SHA-256: ${jevDetail.state_sha256} · ${jevDetail.question_version}`),
     el("p",null,`Verification: state hash matched · ${v.current_policy_version} policy ${v.policy_match?"matched":"mismatched"} · ${v.execution_status}`),
-    el("p",null,"Saved Jev result · no new API call · no response executed"));
+    el("p",null,`Saved ${jevDetail.model||"typed"} result · no new API call · no response executed`));
 }
 function renderJevCohort(svg){svg.setAttribute("viewBox","0 0 1000 930");
   const visible=jevVisibleCases(),selected=jevDetail.id;
@@ -1266,7 +1273,7 @@ function renderJevCohort(svg){svg.setAttribute("viewBox","0 0 1000 930");
     const a=jevSvg("text",{x:x+w/2,y:y+29,"text-anchor":"middle"});a.textContent=title;g.append(a);
     const b=jevSvg("text",{x:x+w/2,y:y+49,"text-anchor":"middle",class:"sub"});b.textContent=subtitle;g.append(b);svg.append(g);};
   label("entry","Saved case cohort",`${visible.length} state-matched cases`,"case");
-  label("jev","Jev decision layer","saved typed API answers","core");
+  label("jev","Typed decision layer","saved answers","core");
   label("choice","Choice","disposition · review queue","signal");
   label("score","Score","evidence · impact","signal");
   label("noul","Noul","four probability gates","signal");
@@ -1366,14 +1373,15 @@ function renderTriage(){
   const labeled=Object.keys(LABELS).filter(id=>events.some(e=>e.id===id));
   const realLabeled=labeled.filter(id=>events.some(e=>e.id===id&&e.jev));
   const agreeJ=realLabeled.filter(id=>{const r=TRI.find(x=>x.e.id===id);return r&&LABELS[id].verdict===r.ans.disposition.choice;}).length;
-  const agreeD=labeled.filter(id=>{const r=TRI.find(x=>x.e.id===id);return r&&((LABELS[id].verdict==="likely_malicious")===(r.e.label==="attack"));}).length;
+  const truthLabeled=labeled.filter(id=>events.some(e=>e.id===id&&e.label_quality==="synthetic_ground_truth"));
+  const agreeD=truthLabeled.filter(id=>{const r=TRI.find(x=>x.e.id===id);return r&&((LABELS[id].verdict==="likely_malicious")===(r.e.label==="attack"));}).length;
   const st=$("triStats");st.textContent="";
   st.append(triStat(c("escalate_for_containment_approval").toLocaleString(),"Escalate","containment approval",C.red),
     triStat(c("analyst_review").toLocaleString(),"Analyst review","needs a human",C.warn),
     triStat(c("route_and_tag").toLocaleString(),"Route + tag","to specialist queue",C.blue),
     triStat(c("analyst_review_low_priority").toLocaleString(),"Low priority","never auto-closed",C.good),
     triStat(ADJQ.size?`${[...ADJQ].filter(id=>LABELS[id]).length}/${ADJQ.size}`:`${labeled.length}`,ADJQ.size?"Queue labeled":"Adjudicated",LOCAL?"saved to adjudications/labels.jsonl":"saved in this browser",C.gov),
-    triStat(realLabeled.length?Math.round(100*agreeJ/realLabeled.length)+"%":"—","Analyst = real Jev",realLabeled.length?`${realLabeled.length} real cases · dataset label agrees ${Math.round(100*agreeD/labeled.length)}%`:"label real Jev cases to measure"));
+    triStat(realLabeled.length?Math.round(100*agreeJ/realLabeled.length)+"%":"—","Analyst = saved answer",realLabeled.length?`${realLabeled.length} matched cases · planted truth agrees ${truthLabeled.length?Math.round(100*agreeD/truthLabeled.length)+"%":"—"}`:"label saved-answer cases to measure"));
   $("triageBadge").textContent=c("escalate_for_containment_approval");
   const done=[...ADJQ].filter(id=>LABELS[id]).length,skipped=[...ADJQ].filter(id=>SKIPPED.has(id)&&!LABELS[id]).length;
   $("triCount").textContent=`${rows.length.toLocaleString()} shown · ${done}/${ADJQ.size} labeled · ${skipped} skipped · ${ADJQ.size-done-skipped} ready`;
@@ -1383,7 +1391,7 @@ function renderTriage(){
     const tr=el("tr");tr.dataset.lvl=e.lvl;tr.dataset.id=e.id;tr.setAttribute("aria-selected",String(triSel===e.id));
     const sv=el("td","sv");sv.append(el("i"));
     const rule=el("td",null,e.rule);rule.title=e.rule;
-    const jv=el("td","mono",(e.jev?"Real · ":"Demo · ")+ans.disposition.choice.replace("likely_","")+" "+ans.disposition.confidence.toFixed(2));
+    const jv=el("td","mono",(e.jev?"Saved · ":e.label==="unlabeled"?"Held · ":"Demo · ")+ans.disposition.choice.replace("likely_","")+" "+ans.disposition.confidence.toFixed(2));
     const pol=el("td");pol.append(el("span","chip "+cls,lbl));if(e.inj)pol.append(document.createTextNode(" "),el("span","chip inj","inj"));
     const L=LABELS[e.id];const lab=el("td","mono",L?L.verdict.replace("likely_",""):"—");if(L)lab.style.color=L.verdict==="likely_malicious"?C.red:L.verdict==="likely_benign"?C.good:C.warn;
     tr.append(sv,rule,el("td","mono",e.host||"—"),jv,pol,el("td","mono",dec.queue+(dec.basis!=="model"?" · fallback":"")),lab);
@@ -1403,10 +1411,10 @@ async function drawCase(id){
   add("provenance",`${e.provenance||"recorded"} · ${e.label_quality||"weak_dataset"}`);
   add("detection",`${e.lvl} · ${(e.tac||[]).join(", ")} ${(e.mitre||[]).join(" ")}`);add("source",e.src);
   add("recorded goodware overlap",e.provenance==="simulated"?"not measured":e.noisy?"rule also fires on goodware":"not observed");
-  if(S.truth)add("dataset label",`${e.label} · ${e.ds} · ${pretty(e.tactic)}`);
+  if(S.truth&&e.label!=="unlabeled")add("dataset label",`${e.label} · ${e.ds} · ${pretty(e.tactic)}`);
   B.append(kv);
   if(e.inj)B.append(el("h4",null,"Injected alert text"),el("pre","snip",e.inj));
-  B.append(el("h4",null,e.jev?"Jev judgments (real API)":"Demo estimate (generated from dataset label)"));
+  B.append(el("h4",null,e.jev?`Saved typed judgments (${e.jev_model||"source unspecified"})`:e.label==="unlabeled"?"No model answer: held for context":"Demo estimate (generated from dataset label)"));
   const bars=el("div","bars");
   const bar=(name,v,col,max=1)=>{const b=el("div","jbar");const t=el("div","tr");const i=el("i");i.style.width=(100*v/max).toFixed(0)+"%";i.style.background=col;t.append(i);b.append(el("span",null,name),t,el("span",null,v.toFixed(2)));bars.append(b);};
   bar("malicious supported",ans.malicious_behavior_supported.noul,C.red);bar("benign plausible",ans.legitimate_admin_plausible.noul,C.good);

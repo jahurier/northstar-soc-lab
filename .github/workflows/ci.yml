@@ -1,4 +1,4 @@
-name: Offline concept smoke test
+name: Portable workbench checks
 on: [push, pull_request]
 jobs:
   smoke:
@@ -11,7 +11,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Check syntax and generate a synthetic day
+      - name: Check syntax and run the synthetic demo
         env:
           LAB_DATA: ${{ runner.temp }}/northstar-data
           JEV_TEST: ${{ runner.temp }}/no-jev-test
@@ -20,3 +20,12 @@ jobs:
           python -m sim.generate --date 2026-09-22 --seed 20260922
           python -m lab.validate scenarios/*.json
           python smoke.py
+      - name: Check a third-party case import and decision replay
+        env:
+          LAB_DATA: ${{ runner.temp }}/northstar-data
+          JEV_TEST: ${{ runner.temp }}/no-jev-test
+          NORTHSTAR_SIM_CASES: ${{ runner.temp }}/no-sim-cases.jsonl
+          NORTHSTAR_RESULTS: examples/typed-results.jsonl
+        run: |
+          python -m lab.import_cases --input examples/cases.jsonl
+          python smoke.py --imported

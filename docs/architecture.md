@@ -23,11 +23,12 @@ flowchart TD
     V --> H[Proposed next state; no host response]
 ```
 
-The **portable demo** runs only the simulator and console. The console's
-browser animation is modeled. When separate Jev results are supplied, the
-decision map replays saved typed outputs and checks that the current policy
-reproduces the saved recommendation. This verifies a decision record, not a
-downstream investigation or endpoint response.
+The **portable workbench** runs the simulator or imports normalized, unlabeled
+alerts. The console's browser animation is modeled where no saved answer is
+available. When typed results are supplied, the decision map replays saved
+outputs and checks that the bundled policy reproduces the saved recommendation.
+This verifies a decision record, not a downstream investigation or endpoint
+response. The public example typed results are manually authored.
 
 The **recorded replay** path consumes external datasets, runs Hayabusa, builds
 case state, and stores truth and observations separately. Source-folder labels

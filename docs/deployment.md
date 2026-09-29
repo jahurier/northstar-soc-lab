@@ -4,7 +4,9 @@
 
 - Python 3.9 or newer and Bash on a local workstation.
 - A browser able to reach `127.0.0.1:8787`.
-- Run `./quickstart.sh`; generated data stays in ignored `runs/`.
+- Run `./quickstart.sh` for synthetic data, or `./quickstart.sh --no-sim
+  --cases /path/to/alerts.jsonl` for your own normalized alerts. Runtime
+  data stays in ignored `runs/`.
 - No network service, account, model, or paid API call is required.
 
 The console binds to loopback. It has a per-start token on mutating endpoints,
@@ -20,10 +22,11 @@ for one operator on a trusted workstation, not public web hosting.
   downloads under `LAB_DATA/quarantine` and keep generated detections under
   `LAB_DATA/runs`. This repository does not redistribute those datasets or
   Hayabusa binaries; check each upstream license before reuse.
-- A separate `jev-test` checkout, compatible saved case corpus, and Jev API
-  access only if you choose to run real typed evaluations. Set `JEV_TEST` to its
-  directory. Saved results must match the case state hash and question version.
-  Paid evaluations should be costed and approved before running.
+- No separate checkout is needed to replay typed results through the bundled
+  policy. If you choose to produce new Jev API answers, use your own authorized
+  runner; the portable workbench does not bundle one. Supply its saved JSONL
+  via `--results`. The question version and case-state hash must match.
+  Cost and approve any paid evaluation before running it.
 
 ## Tier 3: full local macOS range
 

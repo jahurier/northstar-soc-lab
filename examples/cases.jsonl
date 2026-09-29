@@ -1,0 +1,2 @@
+{"id":"EXAMPLE-001","timestamp":"2026-09-22T10:15:00Z","source":"endpoint","host":"DEMO-WS-01","user":"demo.user","rule_id":"DEMO-ENDPOINT-1","rule_title":"Unexpected child process","severity":"med","details":{"ProcessName":"sample.exe","Outcome":"blocked"}}
+{"id":"EXAMPLE-002","timestamp":"2026-09-22T10:35:00Z","source":"identity","host":"DEMO-ID-01","user":"demo.user","rule_id":"DEMO-IDENTITY-1","rule_title":"Repeated failed sign-ins","severity":"high","details":{"Attempts":12,"SourceIP":"192.0.2.24"}}
