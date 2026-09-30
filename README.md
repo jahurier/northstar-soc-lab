@@ -1,5 +1,7 @@
 # Northstar
 
+![Northstar SOC Lab: see every security decision, from case evidence through typed decisions and policy to analyst review](docs/images/northstar-social.png)
+
 **An open-source, local SOC decision workbench.** Bring security alerts into one
 case queue, review typed AI decisions against a fixed policy, and save an
 independent analyst verdict. You can explore it with the included synthetic
